@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+@use "sass:math";
+@use "sass:map";
+
+@function em($px) {
+  @return calc($px / 16) + em;
+}
+@function rem($px) {
+  @return calc($px / 10) + rem;
+}
+
+@function setResp($minFontSize, $maxFontSize, $minViewport, $maxViewport) {
+  $fontSizeRate: $maxFontSize - $minFontSize;
+  $viewportRate: $maxViewport - $minViewport;
+  $minRemFontSize: calc($minFontSize / 10);
+  $maxRemFontSize: calc($maxFontSize / 10);
+  $changingSize: calc((100vw - #{$minViewport}px) * math.div($fontSizeRate, $viewportRate));
+  @return clamp(#{$minRemFontSize}rem, #{$changingSize} + #{$minRemFontSize}rem, #{$maxRemFontSize}rem);
+}
+
+@function setWidthVw($minPx, $maxPx, $viewPortPx) {
+  @return clamp(rem($minPx), calc($maxPx / $viewPortPx * 100vw), rem($maxPx));
+}
+@function setWidthPercent($minPx, $maxPx, $containerPx) {
+  @return clamp(rem($minPx), calc($maxPx / $containerPx * 100%), rem($maxPx));
+}
+
+/* =================================================================
+背景画像
+================================================================== */
+@function bgPosition($img) {
+  $bgPositionX: 0;
+  $bgPositionY: 0;
+
+  @if map.get($img, fullW) - map.get($img, showW) == 0 {
+    $bgPositionX: 0;
+  }
+  @else {
+    $bgPositionX: math.div(map.get($img, posX), (map.get($img, fullW) - map.get($img, showW)));
+  }
+  @if map.get($img, fullH) - map.get($img, showH) == 0 {
+    $bgPositionY: 10;
+  }
+  @else {
+    $bgPositionY: math.div(map.get($img, posY), (map.get($img, fullH) - map.get($img, showH)));
+  }
+  @return calc($bgPositionX * 100%) calc($bgPositionY * 100%);
+}
+
+@function bgSize($img) {
+  @return calc(map.get($img, fullW) / map.get($img, showW) * 100%) auto;
+}
+
+
+$view_xs: 414;
+$view_sm: 500;
+$view_sms: 768;
+$view_smr: 810;
+$view_sml: 928;
+$view_md: 1024;
+$view_mds: 1280;
+$view_mdr: 1440;
+$view_mdl: 1680;
+$view_lg: 1920;
+$view_xl: 2300;
+$view_xxl: 2300;
+
+._common_ttl_base {
+  &__ttl {
+    padding-bottom: setResp(24, 48, $view_sm, $view_lg);
+    border-bottom: 1px solid #ddd;
+    line-height: 1.2;
+    &-en {
+      margin-bottom: setResp(12, 24, $view_sm, $view_md);
+      font-size: setResp(16, 24, $view_sm, $view_md);
+      font-weight: bold;
+      &::before {
+        content: "";
+        display: inline-block;
+        width: setResp(14, 24, $view_sm, $view_lg);
+        height: setResp(14, 24, $view_sm, $view_lg);
+        margin-right: setResp(8, 15, $view_sm, $view_lg);
+        border-radius: 50%;
+        vertical-align: middle;
+      }
+    }
+    &-ja {
+      font-size: setResp(24, 40, $view_lg, $view_xl);
+      font-weight: bold;
+      letter-spacing: 0.25em;
+      @media screen and (max-width: #{$view_md}px) {
+        line-height: 1.6;
+      }
+    }
+    &-add {
+      margin-top: setResp(12, 24, $view_sm, $view_md);
+      color: #999;
+      font-size: setResp(12, 20, $view_sm, $view_md);
+      line-height: 1.6;
+    }
+  }
+}
+
+.foo {
+  &__ttl {
+    $parent: '._common_ttl_base__ttl';
+    @extend #{$parent};
+    margin-bottom: setResp(64, 170, $view_sm, $view_lg);
+    &-en {
+      @extend #{$parent}-en;
+    }
+    &-ja {
+      @extend #{$parent}-ja;
+    }
+    &-add {
+      @extend #{$parent}-add;
+      color: #999;
+    }
+  }
+}
